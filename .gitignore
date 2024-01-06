@@ -1,3 +1,4 @@
 node_modules
 x.json
-credentials.jsontoken.json
+credentials.json
+token.json
