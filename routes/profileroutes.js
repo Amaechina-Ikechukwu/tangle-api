@@ -6,6 +6,7 @@ const {
 const { AddUserData } = require("../controllers/Profile/AddUserData");
 const { InitializeDM } = require("../controllers/Chats/InitializeDM");
 const { checkUserData } = require("../controllers/Profile/isProfileComplete");
+const { GetUserData } = require("../controllers/Profile/GetUserData");
 const profilerouter = express.Router();
 
 profilerouter.post(
@@ -30,6 +31,20 @@ profilerouter.get("/iscomplete", checkTokenMiddleware, async (req, res) => {
     next(error);
   }
 });
+profilerouter.post(
+  "/user",
+  checkTokenMiddleware,
+  checkParametersMiddleware(["user"]),
+  async (req, res) => {
+    try {
+      const { user } = req.body;
+      const result = await GetUserData({ user });
+      res.status(200).json({ result: result.userData });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 profilerouter.post(
   "/initialdm",
   checkTokenMiddleware,

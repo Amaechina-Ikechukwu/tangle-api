@@ -1,4 +1,5 @@
 const { getDatabase, ServerValue } = require("firebase-admin/database");
+const { GetUserData } = require("../Profile/GetUserData");
 
 const GetGroupLastMessage = async ({ groupid }) => {
   try {
@@ -13,7 +14,12 @@ const GetGroupLastMessage = async ({ groupid }) => {
     if (snapshot.exists()) {
       const lastMessageKey = Object.keys(snapshot.val())[0];
       const lastMessage = snapshot.val()[lastMessageKey];
-      return { id: lastMessageKey, ...lastMessage };
+      const userData = await GetUserData({ user: lastMessage.author });
+      return {
+        id: lastMessageKey,
+        ...lastMessage,
+        authorData: userData.userData,
+      };
     } else {
       return null; // No messages found between the users
     }

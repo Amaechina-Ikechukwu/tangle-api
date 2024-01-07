@@ -6,31 +6,30 @@ const { GetGroupLastMessage } = require("../Groups/GetGroupLastMessage");
 
 const DMKeys = async ({ name, child, value }) => {
   try {
-    const ref = getDatabase().ref("dms");
-    const snapshot = await ref.once("value");
+    const ref = getDatabase().ref(name);
+    const snapshot = await ref.orderByChild(child).once("value");
 
-    if (!snapshot.exists()) {
-      return [];
+    if (snapshot.exists()) {
+      let foundKey = [];
+      snapshot.forEach((childSnapshot) => {
+        const childValue = childSnapshot.val();
+        if (
+          childValue &&
+          childValue.members &&
+          childValue.members.hasOwnProperty(value)
+        ) {
+          const members = childValue.members;
+          delete members[value];
+          const keys = Object.keys(members);
+          foundKey.push(keys.length > 0 && keys[0]);
+        }
+      });
+      return foundKey;
+    } else {
+      return null;
     }
-
-    const dms = snapshot.val();
-    const members = [];
-
-    for (const convoId in dms) {
-      const convoRef = ref.child(convoId);
-      const convoSnapshot = await convoRef.once("value");
-      const convoData = convoSnapshot.val();
-
-      if (convoData.members && convoData.members[value] !== undefined) {
-        delete convoData.members[value];
-      }
-
-      members.push(...Object.keys(convoData.members || {}));
-    }
-
-    return members;
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
@@ -74,7 +73,7 @@ const ChatList = async ({ user }) => {
     });
     const groupData = await GetGroupInfo({ groupId: groupkey });
     const grouplastmessage = await GetGroupLastMessage({ groupid: groupkey });
-    console.log({ grouplastmessage });
+
     const userDataPromises = userkey.map(async (key) => {
       const lastMessage = await GetLastMessage({ user: user, friend: key });
       const userData = await GetUserData({ user: key });
@@ -95,6 +94,11 @@ const ChatList = async ({ user }) => {
       : [];
 
     const resultArray = [...dmObjects, ...groupObject];
+    resultArray.sort((a, b) => {
+      const dateA = new Date(a.lastMessage.sent);
+      const dateB = new Date(b.lastMessage.sent);
+      return dateB - dateA; // Sort in descending order (latest first)
+    });
 
     return resultArray;
   } catch (error) {
