@@ -21,7 +21,7 @@ const GetLastMessage = async ({ user, friend }) => {
       if (snapshot.exists()) {
         const lastMessageKey = Object.keys(snapshot.val())[0];
         const lastMessage = snapshot.val()[lastMessageKey];
-        return { id: lastMessageKey, ...lastMessage };
+        return { id: lastMessageKey, ...lastMessage, chatid: userkey };
       } else {
         return null; // No messages found between the users
       }

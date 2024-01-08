@@ -82,7 +82,7 @@ const ChatList = async ({ user }) => {
     });
     const userDataPromises = userkey.map(async (key) => {
       const lastMessage = await GetLastMessage({ user: user, friend: key });
-      const unread = await GetUnreadMessageCount({ user, friend: key });
+      const unread = await GetUnreadMessageCount({ user: user, friend: key });
 
       const userData = await GetUserData({ user: key });
       return { lastMessage, userData, unread };
