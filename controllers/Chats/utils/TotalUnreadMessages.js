@@ -1,12 +1,8 @@
 const { getDatabase } = require("firebase-admin/database");
-const { GetGroupInfo } = require("../Groups/GetGroupInfo");
-const { GetUserData } = require("../Profile/GetUserData");
-const { GetLastMessage } = require("./GetLastMessage");
-const { GetGroupLastMessage } = require("../Groups/GetGroupLastMessage");
-const { GetUnreadMessageCount } = require("./GetUnreadMessages");
+const { GetUnreadMessageCount } = require("../GetUnreadMessages");
 const {
   GetGroupUnreadMessageCount,
-} = require("../Groups/GetGroupUnreadMessages");
+} = require("../../Groups/GetGroupUnreadMessages");
 
 const DMKeys = async ({ name, child, value }) => {
   try {
@@ -67,7 +63,8 @@ const GroupKeys = async ({ name, child, value }) => {
     throw new Error(error);
   }
 };
-const ChatList = async ({ user }) => {
+
+const GetTotalUnreadMessages = async ({ user }) => {
   try {
     const userkey = await DMKeys({ name: "dms", value: user, child: "chats" });
     const groupkey = await GroupKeys({
@@ -75,50 +72,36 @@ const ChatList = async ({ user }) => {
       value: user,
       child: "members",
     });
-    const groupData = await GetGroupInfo({ groupId: groupkey });
-    const grouplastmessage = await GetGroupLastMessage({ groupid: groupkey });
-    const groupUnreadMessages = await GetGroupUnreadMessageCount({
-      groupid: groupkey,
-    });
-    const userDataPromises = userkey.map(async (key) => {
-      const lastMessage = await GetLastMessage({ user: user, friend: key });
-      const unread = await GetUnreadMessageCount({ user, friend: key });
 
-      const userData = await GetUserData({ user: key });
-      return { lastMessage, userData, unread };
-    });
+    let totalUnreadCount = 0;
 
-    const userDataWithLastMessages = await Promise.all(userDataPromises);
+    if (userkey) {
+      const userUnreadCounts = await Promise.all(
+        userkey.map(async (key) => {
+          const unreadCount = await GetUnreadMessageCount({
+            user,
+            friend: key,
+          });
+          return unreadCount;
+        })
+      );
+      totalUnreadCount += userUnreadCounts.reduce(
+        (acc, count) => acc + count,
+        0
+      );
+    }
 
-    const dmObjects = userDataWithLastMessages.map(
-      ({ lastMessage, userData, unread }) => ({
-        type: "dm",
-        lastMessage,
-        ...userData,
-        unread,
-      })
-    );
-    const groupObject = groupData
-      ? [
-          {
-            type: "group",
-            ...groupData,
-            lastMessage: grouplastmessage,
-            unread: groupUnreadMessages,
-          },
-        ]
-      : [];
+    if (groupkey) {
+      const groupUnreadCount = await GetGroupUnreadMessageCount({
+        groupid: groupkey,
+      });
+      totalUnreadCount += groupUnreadCount;
+    }
 
-    const resultArray = [...dmObjects, ...groupObject];
-    resultArray.sort((a, b) => {
-      const dateA = new Date(a.lastMessage.sent);
-      const dateB = new Date(b.lastMessage.sent);
-      return dateB - dateA; // Sort in descending order (latest first)
-    });
-
-    return resultArray;
+    return totalUnreadCount;
   } catch (error) {
     throw new Error(error);
   }
 };
-module.exports = { ChatList };
+
+module.exports = { GetTotalUnreadMessages };
