@@ -19,9 +19,9 @@ const SendDM = async ({ user, friend, message }) => {
         newChatRef.set({
           message: message,
           sent: ServerValue.TIMESTAMP,
-          seenAt: null,
+          seenAt: 0,
           author: user,
-          seenBy: null,
+          seenBy: false,
         }),
       ]);
 
