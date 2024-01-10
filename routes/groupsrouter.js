@@ -18,7 +18,7 @@ groupsrouter.post(
   async (req, res, next) => {
     try {
       const { groupid, message, refid } = req.body;
-      await SendGroupMessage({ user: req.uid, groupid, message, refid });
+      await SendGroupMessage({ user: req.uid, groupid, message, refid: refid });
       res.status(200).json({ result: "chat sent" });
     } catch (error) {
       throw new Error(error);
