@@ -1,6 +1,6 @@
 const { getDatabase, ServerValue } = require("firebase-admin/database");
 
-const SendGroupMessage = async ({ user, groupid, message }) => {
+const SendGroupMessage = async ({ user, groupid, message, refid }) => {
   try {
     const db = getDatabase();
 
@@ -14,6 +14,7 @@ const SendGroupMessage = async ({ user, groupid, message }) => {
         seenAt: null,
         author: user,
         seenBy: null,
+        ref: refid,
       }),
     ]);
 
