@@ -32,8 +32,13 @@ chatsRouter.post(
   checkParametersMiddleware(["friend", "message"]),
   async (req, res, next) => {
     try {
-      const { friend, message } = req.body;
-      await SendDM({ user: req.uid, friend: friend, message: message });
+      const { friend, message, refid } = req.body;
+      await SendDM({
+        user: req.uid,
+        friend: friend,
+        message: message,
+        refid: refid,
+      });
       res.status(200).json({ result: "chat sent" });
     } catch (error) {
       throw new Error(error);
@@ -47,7 +52,11 @@ chatsRouter.post(
   async (req, res, next) => {
     try {
       const { friend, chatid } = req.body;
-      await SeenMessage({ user: req.uid, friend: friend, chatid: chatid });
+      await SeenMessage({
+        user: req.uid,
+        friend: friend,
+        chatid: chatid,
+      });
       res.status(200).json({ result: true });
     } catch (error) {
       throw new Error(error);

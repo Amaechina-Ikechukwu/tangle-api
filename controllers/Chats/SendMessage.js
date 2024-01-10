@@ -2,7 +2,7 @@ const { getDatabase, ServerValue } = require("firebase-admin/database");
 const { v4: uuidv4 } = require("uuid");
 const { GetStorageKeys } = require("./utils/DMKeys");
 
-const SendDM = async ({ user, friend, message }) => {
+const SendDM = async ({ user, friend, message, refid }) => {
   try {
     const userkey = await GetStorageKeys({
       name: "dms",
@@ -22,7 +22,7 @@ const SendDM = async ({ user, friend, message }) => {
           seenAt: 0,
           author: user,
           seenBy: false,
-          ref: "",
+          ref: refid,
         }),
       ]);
 
