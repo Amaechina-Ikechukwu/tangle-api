@@ -1,6 +1,6 @@
 const { getDatabase, ServerValue } = require("firebase-admin/database");
-const { v4: uuidv4 } = require("uuid");
 const { GetStorageKeys } = require("./utils/DMKeys");
+
 const GetAuthorFromChat = async ({ userkey, chatid }) => {
   try {
     const ref = getDatabase().ref(`dms/${userkey}/chats/${chatid}`);
@@ -11,20 +11,19 @@ const GetAuthorFromChat = async ({ userkey, chatid }) => {
         (snapshot) => {
           if (snapshot.exists()) {
             const chatData = snapshot.val();
-
-            const author = chatData.author; // Retrieve the 'author' field
-            resolve(author); // Resolve with the author value
+            const author = chatData.author;
+            resolve(author);
           } else {
-            resolve(null); // Resolve with null if no data exists at that path
+            resolve(null);
           }
         },
         (error) => {
-          reject(error); // Reject the promise if there's an error
+          reject(error);
         }
       );
     });
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
@@ -33,33 +32,33 @@ const SeenMessage = async ({ user, friend, chatid }) => {
     const userkey = await GetStorageKeys({
       name: "dms",
       child: "members",
-      value: user,
+      value: [user, friend],
     });
-    const friendkey = await GetStorageKeys({
-      name: "dms",
-      child: "members",
-      value: friend,
-    });
+
     const db = getDatabase();
     const author = await GetAuthorFromChat({ userkey, chatid });
 
-    if (userkey === friendkey) {
+    if (author !== user) {
       const chatRef = db.ref(`dms/${userkey}/chats/${chatid}`);
-      if (author !== user) {
-        await Promise.all([
-          chatRef.update({
-            read: true,
-            seenAt: ServerValue.TIMESTAMP,
-            seenBy: user,
-          }),
-        ]);
-        return "added";
+      const chatSnapshot = await chatRef.once("value");
+
+      if (chatSnapshot.exists()) {
+        // Update existing document
+        await chatRef.update({
+          read: true,
+          seenAt: ServerValue.TIMESTAMP,
+          seenBy: user,
+        });
+        return "updated";
+      } else {
+        // Document does not exist
+        return null;
       }
     } else {
       return null;
     }
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
