@@ -32,7 +32,7 @@ chatsRouter.post(
   checkParametersMiddleware(["friend", "message"]),
   async (req, res, next) => {
     try {
-      const { friend, message, refid } = req.body;
+      const { friend, message, refid = null } = req.body;
       await SendDM({
         user: req.uid,
         friend: friend,

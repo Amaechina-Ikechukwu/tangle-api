@@ -1,6 +1,7 @@
 const { getDatabase, ServerValue } = require("firebase-admin/database");
 const { v4: uuidv4 } = require("uuid");
 const { GetStorageKeys } = require("./utils/DMKeys");
+const { InitializeDM } = require("./InitializeDM");
 
 const SendDM = async ({ user, friend, message, refid }) => {
   try {
@@ -28,7 +29,8 @@ const SendDM = async ({ user, friend, message, refid }) => {
 
       return "added";
     } else {
-      return null;
+      await InitializeDM({ user, friend });
+      await SendDM({ user, friend, message, refid });
     }
   } catch (error) {
     throw new Error(error.message);
