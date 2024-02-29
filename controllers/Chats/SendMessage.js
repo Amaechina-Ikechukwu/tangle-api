@@ -24,6 +24,7 @@ const SendDM = async ({ user, friend, message, refid }) => {
           author: user,
           seenBy: false,
           ref: refid,
+          read: false,
         }),
       ]);
 
