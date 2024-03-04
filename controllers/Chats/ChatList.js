@@ -79,6 +79,7 @@ const ChatList = async ({ user }) => {
     const grouplastmessage = await GetGroupLastMessage({ groupid: groupkey });
     const groupUnreadMessages = await GetGroupUnreadMessageCount({
       groupid: groupkey,
+      userid: user,
     });
     const userDataPromises = userkey.map(async (key) => {
       const lastMessage = await GetLastMessage({ user: user, friend: key });
