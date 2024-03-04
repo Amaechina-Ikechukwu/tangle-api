@@ -8,6 +8,7 @@ const { groupsrouter } = require("./routes/groupsrouter.js");
 const port = process.env.PORT || 3006;
 const app = express();
 app.use(express.json());
+require("dotenv").config();
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
