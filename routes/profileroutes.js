@@ -9,8 +9,7 @@ const { checkUserData } = require("../controllers/Profile/isProfileComplete");
 const { GetUserData } = require("../controllers/Profile/GetUserData");
 const { default: axios } = require("axios");
 const profilerouter = express.Router();
-require("dotenv").config();
-// const REDIRECT_URI = `${process.env.PROD_URL}/profile/auth/google/callback`; // Adjust the URI
+const REDIRECT_URI = process.env.PROD_URL + `/profile/auth/google/callback`; // Adjust the URI
 profilerouter.use((req, res, next) => {
   const { redirectUri } = req.query;
   if (redirectUri) {
@@ -70,7 +69,6 @@ profilerouter.post(
 );
 profilerouter.get("/auth/google", (req, res) => {
   const authEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
-  const REDIRECT_URI = `${process.env.PROD_URL}/profile/auth/google/callback`;
   const params = {
     client_id: process.env.CLIENTID,
     redirect_uri: REDIRECT_URI,
@@ -111,7 +109,7 @@ profilerouter.get("/auth/google", (req, res) => {
 
 profilerouter.get("/auth/google/callback", async (req, res) => {
   const { code, state } = req.query;
-  const REDIRECT_URI = `${process.env.PROD_URL}/profile/auth/google/callback`;
+
   try {
     const tokenEndpoint = "https://www.googleapis.com/oauth2/v4/token";
     const tokenResponse = await axios.post(tokenEndpoint, null, {
