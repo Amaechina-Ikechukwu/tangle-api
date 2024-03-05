@@ -122,4 +122,4 @@ const ChatList = async ({ user }) => {
     throw new Error(error);
   }
 };
-module.exports = { ChatList };
+module.exports = { ChatList, GroupKeys };

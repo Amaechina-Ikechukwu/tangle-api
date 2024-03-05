@@ -12,6 +12,9 @@ const { SeenGroupMessage } = require("../controllers/Groups/SeenGroupMessage");
 const {
   SeenMessageHistory,
 } = require("../controllers/Groups/SeenMessageHistory");
+const {
+  GetMembersProfileList,
+} = require("../controllers/Groups/GetMembersProfileList");
 const groupsrouter = express.Router();
 
 groupsrouter.post(
@@ -60,6 +63,15 @@ groupsrouter.post(
     }
   }
 );
+
+groupsrouter.get("/memberslist", checkTokenMiddleware, async (req, res) => {
+  try {
+    const result = await GetMembersProfileList({ userid: req.uid });
+    res.status(200).json({ result });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 groupsrouter.use((err, req, res, next) => {
   console.error(err); // Log the error for debugging purposes
