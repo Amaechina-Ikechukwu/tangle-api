@@ -9,6 +9,7 @@ const { checkUserData } = require("../controllers/Profile/isProfileComplete");
 const { GetUserData } = require("../controllers/Profile/GetUserData");
 const { default: axios } = require("axios");
 const profilerouter = express.Router();
+require("dotenv").config();
 const REDIRECT_URI = `${process.env.PROD_URL}/profile/auth/google/callback`; // Adjust the URI
 profilerouter.use((req, res, next) => {
   const { redirectUri } = req.query;
