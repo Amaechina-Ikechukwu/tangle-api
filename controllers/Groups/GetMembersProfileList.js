@@ -20,7 +20,7 @@ const GetMembersProfileList = async ({ userid }) => {
       for (const value in snapshot.val()) {
         const result = await GetUserData({ user: value });
 
-        users[groupkey][result.userKey] = result;
+        users[groupkey][result.userKey] = result.userData;
       }
 
       return users;
