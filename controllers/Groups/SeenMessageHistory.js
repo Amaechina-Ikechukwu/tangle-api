@@ -44,20 +44,22 @@ const SeenMessageHistory = async ({ user, groupid, chatid }) => {
               const profile = await GetUserData({ user: seenByUserId });
               const value = his.val();
               const data = { ...value, ...profile.userData };
-              console.log(data);
+
               dmhistory.push(data);
               resolve(dmhistory);
             });
           } else {
-            reject(null);
+            resolve(dmhistory);
           }
         },
         (error) => {
+          console.log(error);
           reject(error);
         }
       );
     });
   } catch (error) {
+    console.log(error);
     throw new Error(error.message);
   }
 };
