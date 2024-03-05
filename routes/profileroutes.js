@@ -9,7 +9,7 @@ const { checkUserData } = require("../controllers/Profile/isProfileComplete");
 const { GetUserData } = require("../controllers/Profile/GetUserData");
 const { default: axios } = require("axios");
 const profilerouter = express.Router();
-const REDIRECT_URI = `https://ch-gvp8.onrender.com/profile/auth/google/callback`; // Adjust the URI
+const REDIRECT_URI = process.env.PROD_URL + `/profile/auth/google/callback`; // Adjust the URI
 profilerouter.use((req, res, next) => {
   const { redirectUri } = req.query;
   if (redirectUri) {
