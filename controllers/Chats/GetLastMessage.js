@@ -23,12 +23,13 @@ const GetLastMessage = async ({ user, friend }) => {
         const lastMessage = snapshot.val()[lastMessageKey];
         return { id: lastMessageKey, ...lastMessage, chatid: userkey };
       } else {
-        return null; // No messages found between the users
+        return {}; // No messages found between the users
       }
     } else {
-      return null;
+      return {};
     }
   } catch (error) {
+    console.log(error);
     throw new Error(error);
   }
 };
