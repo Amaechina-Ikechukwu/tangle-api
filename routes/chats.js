@@ -19,8 +19,8 @@ chatsRouter.post(
   async (req, res, next) => {
     try {
       const { friend } = req.body;
-      await InitializeDM({ user: req.uid, friend: friend });
-      res.status(200).json({ result: "chat Initialized" });
+      const result = await InitializeDM({ user: req.uid, friend: friend });
+      res.status(200).json({ result: result });
     } catch (error) {
       throw new Error(error);
     }

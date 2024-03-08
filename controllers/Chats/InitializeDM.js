@@ -49,10 +49,15 @@ const InitializeDM = async ({ user, friend }) => {
       const membersRef = db.ref(`dms/${groupId}/members`);
 
       await Promise.all([membersRef.set({ [user]: user, [friend]: friend })]);
+      const key = await GetStorageKeys({
+        name: "dms",
+        child: "members",
+        value: [user, friend],
+      });
 
-      return "added";
+      return key;
     } else {
-      return null;
+      return "initialized";
     }
   } catch (error) {
     throw new Error(error);
