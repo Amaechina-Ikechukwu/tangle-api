@@ -57,7 +57,7 @@ const InitializeDM = async ({ user, friend }) => {
 
       return key;
     } else {
-      return "initialized";
+      return userkey;
     }
   } catch (error) {
     throw new Error(error);
