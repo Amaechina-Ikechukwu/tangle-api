@@ -10,8 +10,11 @@ const GetGroupUnreadMessageCount = async ({ groupid, userid }) => {
     if (snapshot.exists()) {
       snapshot.forEach((childSnapshot) => {
         const messages = childSnapshot.val(); // Get the value of the child node
-        Object.values(messages).forEach((message) => {
-          if (!message.seenBy || !message.seenBy.includes(userid)) {
+       
+        Object.values(messages.seen).forEach((message) => {
+          
+          if (message.seenBy !==userid) {
+         
             number++;
           }
         });

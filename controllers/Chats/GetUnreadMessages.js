@@ -14,10 +14,11 @@ const GetUnreadMessageCount = async ({ user, friend }) => {
       const membersRef = db.ref(`dms/${userkey}/chats`);
 
       const snapshot = await membersRef
-        .orderByChild("seenBy")
-        .equalTo(null)
+        .orderByChild("read")
+        .equalTo(false)
         .once("value");
       if (snapshot.exists()) {
+       
         return snapshot.numChildren(); // Count the number of unread messages
       } else {
         return 0; // No unread messages found between the users
