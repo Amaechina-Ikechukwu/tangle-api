@@ -1,8 +1,5 @@
 const { getDatabase } = require("firebase-admin/database");
 const { GetUnreadMessageCount } = require("../GetUnreadMessages");
-const {
-  GetGroupUnreadMessageCount,
-} = require("../../Groups/GetGroupUnreadMessages");
 
 const DMKeys = async ({ name, child, value }) => {
   try {
@@ -33,45 +30,9 @@ const DMKeys = async ({ name, child, value }) => {
   }
 };
 
-const GroupKeys = async ({ name, child, value }) => {
-  try {
-    const ref = getDatabase().ref(name);
-
-    return new Promise((resolve, reject) => {
-      ref.orderByChild(child).once(
-        "value",
-        (snapshot) => {
-          if (snapshot.exists()) {
-            let foundkey = null; // Initialize foundKey outside forEach
-            snapshot.forEach((childSnapshot) => {
-              const childValue = childSnapshot.val();
-              if (childValue.members[value] == value) {
-                foundkey = childSnapshot.key; // Update foundKey if match found
-              }
-            });
-            resolve(foundkey); // Resolve with foundKey (could be null if no match)
-          } else {
-            resolve(null); // Resolve with null if no data exists
-          }
-        },
-        (error) => {
-          reject(error); // Reject the promise if there's an error
-        }
-      );
-    });
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 const GetTotalUnreadMessages = async ({ user }) => {
   try {
     const userkey = await DMKeys({ name: "dms", value: user, child: "chats" });
-    const groupkey = await GroupKeys({
-      name: "groups",
-      value: user,
-      child: "members",
-    });
 
     let totalUnreadCount = 0;
 
@@ -89,13 +50,6 @@ const GetTotalUnreadMessages = async ({ user }) => {
         (acc, count) => acc + count,
         0
       );
-    }
-
-    if (groupkey) {
-      const groupUnreadCount = await GetGroupUnreadMessageCount({
-        groupid: groupkey,
-      });
-      totalUnreadCount += groupUnreadCount;
     }
 
     return totalUnreadCount;

@@ -33,26 +33,25 @@ const GetStorageKeys = async ({ name, child, value }) => {
     throw new Error(error);
   }
 };
-const InitializeDM = async ({ user, friend }) => {
+const InitializeDM = async ({ user, matchid }) => {
   try {
     const userkey = await GetStorageKeys({
       name: "dms",
       child: "members",
-      value: [user, friend],
+      value: [user, matchid],
     });
 
     const db = getDatabase();
     const ref = db.ref("dms").push();
-    const groupId = ref.key;
 
     if (!userkey) {
-      const membersRef = db.ref(`dms/${groupId}/members`);
+      const membersRef = db.ref(`dms/${ref.key}/members`);
 
-      await Promise.all([membersRef.set({ [user]: user, [friend]: friend })]);
+      await Promise.all([membersRef.set({ [user]: user, [matchid]: matchid })]);
       const key = await GetStorageKeys({
         name: "dms",
         child: "members",
-        value: [user, friend],
+        value: [user, matchid],
       });
 
       return key;

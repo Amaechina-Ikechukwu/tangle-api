@@ -15,11 +15,11 @@ const chatsRouter = express.Router();
 chatsRouter.post(
   "/initializedm",
   checkTokenMiddleware,
-  checkParametersMiddleware(["friend"]),
+  checkParametersMiddleware(["matchid"]),
   async (req, res, next) => {
     try {
-      const { friend } = req.body;
-      const result = await InitializeDM({ user: req.uid, friend: friend });
+      const { matchid } = req.body;
+      const result = await InitializeDM({ user: req.uid, matchid: matchid });
       res.status(200).json({ result: result });
     } catch (error) {
       throw new Error(error);

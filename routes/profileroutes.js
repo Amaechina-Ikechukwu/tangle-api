@@ -8,8 +8,14 @@ const { InitializeDM } = require("../controllers/Chats/InitializeDM");
 const { checkUserData } = require("../controllers/Profile/isProfileComplete");
 const { GetUserData } = require("../controllers/Profile/GetUserData");
 const { default: axios } = require("axios");
+const {
+  EmailVerification,
+} = require("../controllers/Authentication/EmailVerification");
 const profilerouter = express.Router();
 const REDIRECT_URI = process.env.PROD_URL + `/profile/auth/google/callback`; // Adjust the URI
+const path = require("path");
+const { VerifyEmail } = require("../controllers/Profile/VerifyEmail");
+
 profilerouter.use((req, res, next) => {
   const { redirectUri } = req.query;
   if (redirectUri) {
@@ -17,14 +23,48 @@ profilerouter.use((req, res, next) => {
   }
   next();
 });
+
+profilerouter.post(
+  "/verfiyemail",
+  checkParametersMiddleware(["email"]),
+  async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      await EmailVerification({
+        useremail: email,
+      });
+      res.status(200).json({ result: "verfied" });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+);
 profilerouter.post(
   "/adduser",
   checkTokenMiddleware,
-  checkParametersMiddleware(["nickname", "camp"]),
+  checkParametersMiddleware([
+    "username",
+    "fullName",
+    "age",
+    "gender",
+    "interest",
+    "bio",
+    "imageurl",
+  ]),
   async (req, res, next) => {
     try {
-      const { nickname, camp } = req.body;
-      await AddUserData({ user: req.uid, name: nickname, camp });
+      const { username, fullName, age, gender, interest, bio, imageurl } =
+        req.body;
+      await AddUserData({
+        user: req.uid,
+        username,
+        fullName,
+        age,
+        gender,
+        interest,
+        bio,
+        imageurl,
+      });
       res.status(200).json({ result: "User added" });
     } catch (error) {
       throw new Error(error);
@@ -43,7 +83,7 @@ profilerouter.post(
   "/user",
   checkTokenMiddleware,
   checkParametersMiddleware(["user"]),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const { user } = req.body;
       const result = await GetUserData({ user });
@@ -67,6 +107,40 @@ profilerouter.post(
     }
   }
 );
+profilerouter.get("/confirmverification", async (req, res) => {
+  try {
+    const { user } = req.query;
+
+    const imagePath = path.join(__dirname, "../images/logos/jt-logo.png");
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gray-100 h-screen flex flex-col justify-center items-center">
+    <img src='${imagePath}' />
+      <button class="bg-[#f43f5e] hover:bg-[#f43f5e] text-[#f43f5e] font-bold py-2 px-4 rounded">
+        <a href="#">Go to the app</a>
+      </button>
+      <script>
+        const receiveMessage = (event) => {
+          if (event.origin !== "${"your-redirect-uri"}") return;
+          const token = event.data.token;
+          console.log("Access token:", token);
+          window.close();
+        };
+        window.addEventListener("message", receiveMessage, false);
+      </script>
+    </body>
+    </html>
+  `;
+    await VerifyEmail({ salt: user.split(" ").join("+") });
+    res.status(200).send(html);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
 profilerouter.get("/auth/google", (req, res) => {
   const authEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
   const params = {

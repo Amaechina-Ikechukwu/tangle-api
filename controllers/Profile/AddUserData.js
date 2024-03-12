@@ -1,11 +1,25 @@
 const { getDatabase } = require("firebase-admin/database");
 const { InitializeCampGroup } = require("../Actions/InitializeCampGroup");
-const AddUserData = async ({ user, name, camp }) => {
+const AddUserData = async ({
+  user,
+  username,
+  fullName,
+  age,
+  gender,
+  interest,
+  bio,
+  imageurl,
+}) => {
   await getDatabase()
     .ref(`users/${user}`)
-    .set({
-      nickname: name,
-      camp: { ...camp },
+    .update({
+      username: username.toLowerCase(),
+      fullName,
+      age,
+      gender,
+      interest,
+      bio,
+      imageurl,
     })
     .then(async (result) => {
       return "added";
@@ -13,7 +27,6 @@ const AddUserData = async ({ user, name, camp }) => {
     .catch((error) => {
       throw new Error(error);
     });
-  await InitializeCampGroup({ user, camp });
 };
 module.exports = {
   AddUserData,

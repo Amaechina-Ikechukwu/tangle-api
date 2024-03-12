@@ -3,12 +3,12 @@ const { v4: uuidv4 } = require("uuid");
 const { GetStorageKeys } = require("./utils/DMKeys");
 const { InitializeDM } = require("./InitializeDM");
 
-const SendDM = async ({ user, friend, message, refid }) => {
+const SendDM = async ({ user, matchid, message, refid }) => {
   try {
     const userkey = await GetStorageKeys({
       name: "dms",
       child: "members",
-      value: [user, friend],
+      value: [user, matchid],
     });
 
     const db = getDatabase();
@@ -30,8 +30,8 @@ const SendDM = async ({ user, friend, message, refid }) => {
 
       return "added";
     } else {
-      await InitializeDM({ user, friend });
-      await SendDM({ user, friend, message, refid });
+      await InitializeDM({ user, matchid });
+      await SendDM({ user, matchid, message, refid });
     }
   } catch (error) {
     throw new Error(error.message);

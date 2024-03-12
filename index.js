@@ -4,16 +4,15 @@ const { fetchAndListMajors } = require("./controllers/camps/ListOfCamps.js");
 const serviceAccount = require("./x.json");
 const { profilerouter } = require("./routes/profileroutes.js");
 const { chatsRouter } = require("./routes/chats.js");
-const { groupsrouter } = require("./routes/groupsrouter.js");
+const { matchrouter } = require("./routes/matchroutes.js");
 const port = process.env.PORT || 3006;
 const app = express();
 app.use(express.json());
 require("dotenv").config();
-
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://corpers-hang-default-rtdb.firebaseio.com/",
+  databaseURL: "https://tangle-eede1-default-rtdb.firebaseio.com/",
 });
 
 app.get("/camp", async (req, res, next) => {
@@ -28,7 +27,7 @@ app.get("/camp", async (req, res, next) => {
 
 app.use("/profile", profilerouter);
 app.use("/chats", chatsRouter);
-app.use("/groups", groupsrouter);
+app.use("/matches", matchrouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
