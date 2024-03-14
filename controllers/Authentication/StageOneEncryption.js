@@ -6,7 +6,6 @@ const argon2 = require("argon2");
 
  */
 const StageOneEncryption = async ({ userid }) => {
-  console.log({ userid });
   try {
     const hash = await argon2.hash(userid);
     return hash;

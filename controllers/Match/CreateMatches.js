@@ -1,6 +1,7 @@
+const { GetUserData } = require("../Profile/GetUserData");
 const { GetUserArrays, GetOtherUsersArrays } = require("./GetArrays");
 
-function percentageMatch(array1, array2) {
+async function percentageMatch(array1, array2) {
   const minLength = Math.min(array1.length, array2.length);
   let totalPercentage = 0;
 
@@ -18,12 +19,21 @@ const CreateMatches = async ({ currentUser }) => {
   const currentUserArray = await GetUserArrays({ currentUser });
   const otherUsersArray = await GetOtherUsersArrays({});
 
-  const matches = [];
-  otherUsersArray.forEach((user) => {
-    const matchPercentage = percentageMatch(currentUserArray, user.interest);
-    matches.push({ userId: user.userId, matchPercentage: matchPercentage });
+  const matchPromises = otherUsersArray.map(async (user) => {
+    const matchPercentage = await percentageMatch(
+      currentUserArray,
+      user.interest
+    );
+    const { userData } = await GetUserData({ user: user.userId });
+    return {
+      userId: user.userId,
+      matchPercentage: matchPercentage,
+      userData,
+    };
   });
 
+  const matches = await Promise.all(matchPromises);
   return matches.sort((x, y) => y.matchPercentage - x.matchPercentage);
 };
+
 module.exports = { CreateMatches };

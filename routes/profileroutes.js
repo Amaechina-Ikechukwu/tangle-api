@@ -35,7 +35,7 @@ profilerouter.post(
       });
       res.status(200).json({ result: "verfied" });
     } catch (error) {
-      throw new Error(error);
+      next(error);
     }
   }
 );
@@ -55,6 +55,7 @@ profilerouter.post(
     try {
       const { username, fullName, age, gender, interest, bio, imageurl } =
         req.body;
+
       await AddUserData({
         user: req.uid,
         username,
@@ -67,7 +68,8 @@ profilerouter.post(
       });
       res.status(200).json({ result: "User added" });
     } catch (error) {
-      throw new Error(error);
+      console.log(error);
+      next(error);
     }
   }
 );
@@ -127,7 +129,7 @@ profilerouter.get("/confirmverification", async (req, res) => {
         const receiveMessage = (event) => {
           if (event.origin !== "${"your-redirect-uri"}") return;
           const token = event.data.token;
-          console.log("Access token:", token);
+        
           window.close();
         };
         window.addEventListener("message", receiveMessage, false);
@@ -169,7 +171,7 @@ profilerouter.get("/auth/google", (req, res) => {
         const receiveMessage = (event) => {
           if (event.origin !== "${"your-redirect-uri"}") return;
           const token = event.data.token;
-          console.log("Access token:", token);
+          
           window.close();
         };
         window.addEventListener("message", receiveMessage, false);
