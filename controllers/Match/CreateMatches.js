@@ -19,23 +19,30 @@ const CreateMatches = async ({ currentUser }) => {
   const currentUserArray = await GetUserArrays({ currentUser });
   const otherUsersArray = await GetOtherUsersArrays({});
 
-  const matchPromises = otherUsersArray.map(async (user) => {
-    if (user.interest) {
-      const matchPercentage = await percentageMatch(
-        currentUserArray,
-        user.interest
-      );
-      const { userData } = await GetUserData({ user: user.userId });
-      return {
-        userId: user.userId,
-        matchPercentage: matchPercentage,
-        userData,
-      };
-    }
-  });
+  const matches = await Promise.all(
+    otherUsersArray.map(async (user) => {
+      if (user.interest) {
+        const matchPercentage = await percentageMatch(
+          currentUserArray,
+          user.interest
+        );
+        const { userData } = await GetUserData({ user: user.userId });
+        return {
+          userId: user.userId,
+          matchPercentage: matchPercentage,
+          ...userData,
+          commonInterests: currentUserArray.filter((interest) =>
+            user.interest.includes(interest)
+          ),
+        };
+      }
+    })
+  );
 
-  const matches = await Promise.all(matchPromises);
-  return matches.sort((x, y) => y.matchPercentage - x.matchPercentage);
+  // Sort matches by matchPercentage in descending order
+  matches.sort((x, y) => y.matchPercentage - x.matchPercentage);
+
+  return matches;
 };
 
 module.exports = { CreateMatches };
