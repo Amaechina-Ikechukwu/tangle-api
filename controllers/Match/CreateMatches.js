@@ -2,17 +2,17 @@ const { GetUserData } = require("../Profile/GetUserData");
 const { GetUserArrays, GetOtherUsersArrays } = require("./GetArrays");
 
 async function percentageMatch(array1, array2) {
-  const minLength = Math.min(array1.length, array2.length);
-  let totalPercentage = 0;
+  const totalItems = Math.max(array1.length, array2.length);
+  let commonItems = 0;
 
-  for (let i = 0; i < minLength; i++) {
-    if (array1[i] === array2[i]) {
-      totalPercentage += 100;
+  for (const item of array1) {
+    if (array2.includes(item)) {
+      commonItems++;
     }
   }
 
-  const averagePercentage = totalPercentage / minLength || 0; // Prevent division by zero
-  return averagePercentage;
+  const matchPercentage = Math.round((commonItems / totalItems) * 100);
+  return matchPercentage;
 }
 
 const CreateMatches = async ({ currentUser }) => {
@@ -26,6 +26,7 @@ const CreateMatches = async ({ currentUser }) => {
           currentUserArray,
           user.interest
         );
+
         const { userData } = await GetUserData({ user: user.userId });
         return {
           userId: user.userId,

@@ -55,7 +55,7 @@ const ChatList = async ({ user }) => {
       })
     );
 
-    const resultArray = [...dmObjects, ...groupObject];
+    const resultArray = [...dmObjects];
     resultArray.sort((a, b) => {
       const dateA = new Date(a.lastMessage.sent);
       const dateB = new Date(b.lastMessage.sent);

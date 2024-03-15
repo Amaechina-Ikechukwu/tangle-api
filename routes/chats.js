@@ -29,13 +29,13 @@ chatsRouter.post(
 chatsRouter.post(
   "/senddm",
   checkTokenMiddleware,
-  checkParametersMiddleware(["friend", "message"]),
+  checkParametersMiddleware(["matchid", "message"]),
   async (req, res, next) => {
     try {
-      const { friend, message, refid = null } = req.body;
+      const { matchid, message, refid = null } = req.body;
       await SendDM({
         user: req.uid,
-        friend: friend,
+        matchid: matchid,
         message: message,
         refid: refid,
       });

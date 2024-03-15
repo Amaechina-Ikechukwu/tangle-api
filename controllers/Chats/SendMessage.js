@@ -30,7 +30,6 @@ const SendDM = async ({ user, matchid, message, refid }) => {
 
       return "added";
     } else {
-      await InitializeDM({ user, matchid });
       await SendDM({ user, matchid, message, refid });
     }
   } catch (error) {
