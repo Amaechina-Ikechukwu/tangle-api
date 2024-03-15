@@ -20,16 +20,18 @@ const CreateMatches = async ({ currentUser }) => {
   const otherUsersArray = await GetOtherUsersArrays({});
 
   const matchPromises = otherUsersArray.map(async (user) => {
-    const matchPercentage = await percentageMatch(
-      currentUserArray,
-      user.interest
-    );
-    const { userData } = await GetUserData({ user: user.userId });
-    return {
-      userId: user.userId,
-      matchPercentage: matchPercentage,
-      userData,
-    };
+    if (user.interest) {
+      const matchPercentage = await percentageMatch(
+        currentUserArray,
+        user.interest
+      );
+      const { userData } = await GetUserData({ user: user.userId });
+      return {
+        userId: user.userId,
+        matchPercentage: matchPercentage,
+        userData,
+      };
+    }
   });
 
   const matches = await Promise.all(matchPromises);
