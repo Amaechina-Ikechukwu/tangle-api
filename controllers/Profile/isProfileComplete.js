@@ -14,12 +14,13 @@ const checkUserData = async (userId) => {
     const userData = userSnapshot.val();
 
     const requiredFields = [
-      "fullname",
+      "fullName",
       "username",
       "gender",
       "age",
       "bio",
-      "imageUrl",
+      "imageurl",
+      "email",
     ];
 
     const allFieldsPresent = requiredFields.every(

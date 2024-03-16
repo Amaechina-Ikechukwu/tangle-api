@@ -19,8 +19,13 @@ const CreateMatches = async ({ currentUser }) => {
   const currentUserArray = await GetUserArrays({ currentUser });
   const otherUsersArray = await GetOtherUsersArrays({});
 
+  // Filter out the current user from other users array
+  const filteredOtherUsersArray = otherUsersArray.filter(
+    (user) => user.userId !== currentUser
+  );
+
   const matches = await Promise.all(
-    otherUsersArray.map(async (user) => {
+    filteredOtherUsersArray.map(async (user) => {
       if (user.interest) {
         const matchPercentage = await percentageMatch(
           currentUserArray,

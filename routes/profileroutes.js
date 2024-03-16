@@ -50,11 +50,20 @@ profilerouter.post(
     "interest",
     "bio",
     "imageurl",
+    "email",
   ]),
   async (req, res, next) => {
     try {
-      const { username, fullName, age, gender, interest, bio, imageurl } =
-        req.body;
+      const {
+        username,
+        fullName,
+        age,
+        gender,
+        interest,
+        bio,
+        imageurl,
+        email,
+      } = req.body;
 
       await AddUserData({
         user: req.uid,
@@ -65,6 +74,7 @@ profilerouter.post(
         interest,
         bio,
         imageurl,
+        email,
       });
       res.status(200).json({ result: "User added" });
     } catch (error) {
@@ -73,14 +83,18 @@ profilerouter.post(
     }
   }
 );
-profilerouter.get("/iscomplete", checkTokenMiddleware, async (req, res) => {
-  try {
-    const result = await checkUserData({ userId: req.uid });
-    res.status(200).json({ result });
-  } catch (error) {
-    next(error);
+profilerouter.get(
+  "/iscomplete",
+  checkTokenMiddleware,
+  async (req, res, next) => {
+    try {
+      const result = await checkUserData(req.uid);
+      res.status(200).json({ result });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 profilerouter.post(
   "/user",
   checkTokenMiddleware,

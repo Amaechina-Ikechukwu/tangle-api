@@ -9,6 +9,7 @@ const AddUserData = async ({
   interest,
   bio,
   imageurl,
+  email,
 }) => {
   await getDatabase()
     .ref(`users/${user}`)
@@ -20,6 +21,7 @@ const AddUserData = async ({
       interest,
       bio,
       imageurl,
+      email,
     })
     .then(async (result) => {
       return "added";
