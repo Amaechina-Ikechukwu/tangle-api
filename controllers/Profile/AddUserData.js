@@ -1,5 +1,4 @@
 const { getDatabase } = require("firebase-admin/database");
-const { InitializeCampGroup } = require("../Actions/InitializeCampGroup");
 const AddUserData = async ({
   user,
   username,

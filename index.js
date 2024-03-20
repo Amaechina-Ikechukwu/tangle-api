@@ -5,6 +5,7 @@ const serviceAccount = require("./x.json");
 const { profilerouter } = require("./routes/profileroutes.js");
 const { chatsRouter } = require("./routes/chats.js");
 const { matchrouter } = require("./routes/matchroutes.js");
+const { postrouter } = require("./routes/post.js");
 const port = process.env.PORT || 3006;
 const app = express();
 app.use(express.json());
@@ -28,6 +29,7 @@ app.get("/camp", async (req, res, next) => {
 app.use("/profile", profilerouter);
 app.use("/chats", chatsRouter);
 app.use("/matches", matchrouter);
+app.use("/posts", postrouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
