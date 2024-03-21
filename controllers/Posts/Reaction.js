@@ -2,12 +2,17 @@ const { getDatabase, ServerValue } = require("firebase-admin/database");
 const GetLikeKey = async ({ currentUser, postid }) => {
   try {
     const likeRef = getDatabase().ref(`likes/${postid}`);
+
     const snapshot = await likeRef
-      .orderByChild("liked")
+      .orderByChild("likedBy")
       .equalTo(currentUser)
       .once("value");
     if (snapshot.exists()) {
-      return snapshot.key;
+      for (const key in snapshot.val()) {
+        if (snapshot.val()[key].likedBy == currentUser) {
+          return key;
+        }
+      }
     } else {
       return null;
     }
@@ -19,14 +24,14 @@ const HasUserLikedPost = async ({ currentUser, postid }) => {
   try {
     const likeRef = getDatabase().ref(`likes/${postid}`);
     const snapshot = await likeRef
-      .orderByChild("liked")
+      .orderByChild("likedBy")
       .equalTo(currentUser)
       .once("value");
     if (snapshot.exists()) {
-      if (snapshot.val().liked == true) {
-        return snapshot.val().liked;
-      } else {
-        return false;
+      for (const key in snapshot.val()) {
+        if (snapshot.val()[key].likedBy == currentUser) {
+          return snapshot.val()[key].liked;
+        }
       }
     } else {
       return null;
@@ -39,7 +44,7 @@ const HasUserLikedPost = async ({ currentUser, postid }) => {
 const LikePost = async ({ currentUser, location, postid }) => {
   try {
     const hasUserLikedPost = await HasUserLikedPost({ currentUser, postid });
-    if (!hasUserLikedPost) {
+    if (hasUserLikedPost == null) {
       const postRef = getDatabase().ref(`likes/${postid}`).push();
       await postRef.set({
         likedBy: currentUser,
@@ -68,7 +73,7 @@ const LikePost = async ({ currentUser, location, postid }) => {
 const UnLikePost = async ({ currentUser, location, postid }) => {
   try {
     const key = await GetLikeKey({ currentUser, postid });
-
+    console.log(key);
     if (key) {
       const postRef = getDatabase().ref(`likes/${postid}/${key}`);
       await Promise.all([

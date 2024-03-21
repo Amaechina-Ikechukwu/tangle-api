@@ -6,6 +6,7 @@ const {
 const { CreatePost } = require("../controllers/Posts/CreatePosts");
 const { GetPosts } = require("../controllers/Posts/GetPosts");
 const { LikePost, UnLikePost } = require("../controllers/Posts/Reaction");
+const { CommentOnPost, GetComment } = require("../controllers/Posts/Comment");
 
 const postrouter = express.Router();
 
@@ -60,6 +61,37 @@ postrouter.post(
     }
   }
 );
+postrouter.post(
+  "/addcomment",
+  checkTokenMiddleware,
+  checkParametersMiddleware(["postid", "comment"]),
+  async (req, res, next) => {
+    try {
+      const { postid, location, comment } = req.body;
+      const result = await CommentOnPost({
+        currentUser: req.uid,
+        postid,
+        location,
+        comment,
+      });
+      res.status(200).json(result); // Sending a success response
+    } catch (error) {
+      next(error); // Passing the error to the error handling middleware
+    }
+  }
+);
+postrouter.get("/getcomments", checkTokenMiddleware, async (req, res, next) => {
+  try {
+    const { postid } = req.query;
+    const result = await GetComment({
+      currentUser: req.uid,
+      postid,
+    });
+    res.status(200).json(result); // Sending a success response
+  } catch (error) {
+    next(error); // Passing the error to the error handling middleware
+  }
+});
 postrouter.get("/getposts", checkTokenMiddleware, async (req, res, next) => {
   try {
     const result = await GetPosts({ currentUser: req.uid });
