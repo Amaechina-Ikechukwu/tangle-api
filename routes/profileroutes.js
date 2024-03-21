@@ -15,6 +15,7 @@ const profilerouter = express.Router();
 const REDIRECT_URI = process.env.PROD_URL + `/profile/auth/google/callback`; // Adjust the URI
 const path = require("path");
 const { VerifyEmail } = require("../controllers/Profile/VerifyEmail");
+const { UploadLocation } = require("../controllers/Profile/UpdateLocation");
 
 profilerouter.use((req, res, next) => {
   const { redirectUri } = req.query;
@@ -34,6 +35,19 @@ profilerouter.post(
         useremail: email,
       });
       res.status(200).json({ result: "verfied" });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+profilerouter.post(
+  "/updateL",
+  checkParametersMiddleware(["location"]),
+  async (req, res, next) => {
+    try {
+      const { location } = req.body;
+      await UploadLocation({ user: req.uid, location });
+      res.status(200).json({ result: "" });
     } catch (error) {
       next(error);
     }

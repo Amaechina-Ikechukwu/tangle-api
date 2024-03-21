@@ -6,6 +6,7 @@ const { profilerouter } = require("./routes/profileroutes.js");
 const { chatsRouter } = require("./routes/chats.js");
 const { matchrouter } = require("./routes/matchroutes.js");
 const { postrouter } = require("./routes/post.js");
+const { storiesrouter } = require("./routes/storiesroutes.js");
 const port = process.env.PORT || 3006;
 const app = express();
 app.use(express.json());
@@ -30,6 +31,7 @@ app.use("/profile", profilerouter);
 app.use("/chats", chatsRouter);
 app.use("/matches", matchrouter);
 app.use("/posts", postrouter);
+app.use("/stories", storiesrouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
