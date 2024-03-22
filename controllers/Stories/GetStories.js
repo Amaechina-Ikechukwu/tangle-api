@@ -2,7 +2,16 @@ const {
   StoriesOfPeopleChattedWith,
   CurrentUsersStory,
 } = require("../Actions/Posts/StoriesActions");
-
+function groupByAuthor(stories) {
+  return stories.reduce((groupedstory, story) => {
+    const author = story.author;
+    if (!groupedstory[author]) {
+      groupedstory[author] = [];
+    }
+    groupedstory[author].push(story);
+    return groupedstory;
+  }, {});
+}
 const GetStories = async ({ currentUser }) => {
   try {
     // Retrieve posts from chats and own posts
@@ -28,7 +37,7 @@ const GetStories = async ({ currentUser }) => {
       return 0;
     });
 
-    return sortedPosts;
+    return groupByAuthor(sortedPosts);
   } catch (error) {
     console.log(error);
     throw new Error("Failed to retrieve posts."); // Throw error if retrieval fails

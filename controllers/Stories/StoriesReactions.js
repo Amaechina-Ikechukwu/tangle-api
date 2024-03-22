@@ -10,7 +10,7 @@ const StorySeenCount = async ({ currentUser, storyid }) => {
           if (snapshot.exists()) {
             resolve(snapshot.numChildren());
           } else {
-            resolve(null);
+            resolve(0);
           }
         },
         (error) => {

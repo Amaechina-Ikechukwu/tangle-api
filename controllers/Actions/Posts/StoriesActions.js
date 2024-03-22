@@ -1,7 +1,10 @@
 const { getDatabase } = require("firebase-admin/database");
 const { DMKeys } = require("../../Chats/ChatList");
 const { GetUserData } = require("../../Profile/GetUserData");
-const { HasUserSeenStory } = require("../../Stories/StoriesReactions");
+const {
+  HasUserSeenStory,
+  StorySeenCount,
+} = require("../../Stories/StoriesReactions");
 function isMoreThan24HoursAgo({ timestamp }) {
   // Get the current time
   var currentTime = Date.now();
@@ -32,11 +35,16 @@ const CurrentUsersStory = async ({ currentUser }) => {
             currentUser: snapshot.val()[key].author,
             storyid: key,
           });
+          const views = await StorySeenCount({
+            currentUser,
+            storyid: key,
+          });
           stories.push({
             userData,
             ...snapshot.val()[key],
             storyid: key,
             seen,
+            views,
           });
         }
       }
@@ -76,10 +84,12 @@ const StoriesOfPeopleChattedWith = async ({ currentUser }) => {
             currentUser: snapshot.val()[key].author,
             storyid: key,
           });
+          const views = await StorySeenCount({ currentUser, storyid: key });
           stories.push({
             userData,
             ...snapshot.val()[key],
             seen,
+            views,
           });
         }
       }
