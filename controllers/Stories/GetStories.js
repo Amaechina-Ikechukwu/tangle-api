@@ -3,15 +3,24 @@ const {
   CurrentUsersStory,
 } = require("../Actions/Posts/StoriesActions");
 function groupByAuthor(stories) {
-  return stories.reduce((groupedstory, story) => {
+  // Grouping stories by author
+  const groupedStories = stories.reduce((groupedStory, story) => {
     const author = story.author;
-    if (!groupedstory[author]) {
-      groupedstory[author] = [];
+    if (!groupedStory[author]) {
+      groupedStory[author] = [];
     }
-    groupedstory[author].push(story);
-    return groupedstory;
+    groupedStory[author].push(story);
+    return groupedStory;
   }, {});
+
+  // Sorting stories within each author's group by timestamp
+  for (const author in groupedStories) {
+    groupedStories[author].sort((a, b) => b.timestamp - a.timestamp); // Assuming timestamp is a numerical value
+  }
+
+  return groupedStories;
 }
+
 const GetStories = async ({ currentUser }) => {
   try {
     // Retrieve posts from chats and own posts
